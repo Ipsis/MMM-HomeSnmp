@@ -1,0 +1,4 @@
+Module.register("MMM-HomeSnmp", {
+
+});
+

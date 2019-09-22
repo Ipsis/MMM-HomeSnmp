@@ -1,0 +1,22 @@
+{
+  "name": "mmm-homesnmp",
+  "version": "1.0.0",
+  "description": "My home network SNMP module",
+  "main": "MMM-HomeSnmp",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ipsis/MMM-HomeSnmp.git"
+  },
+  "author": "Ipsis",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Ipsis/MMM-HomeSnmp/issues"
+  },
+  "homepage": "https://github.com/Ipsis/MMM-HomeSnmp#readme",
+  "dependencies": {
+    "net-snmp": "^1.2.4"
+  }
+}
