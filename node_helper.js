@@ -194,11 +194,10 @@ function CalcLoad(host, index) {
 
     data = snmpData[host][index];
 
-    if ((data["timestamp"] - data["last_timestamp"]) / 1000 <= config.interval)
-        return { rx: data["last_bw_rxBits"], tx: data["last_bw_txBits"], speed: data["last_bw_speed"] };
+/*    if ((data["timestamp"] - data["last_timestamp"]) / 1000 <= config.interval)
+        return { rx: data["last_bw_rxBits"], tx: data["last_bw_txBits"], speed: data["last_bw_speed"] }; */
 
-
-    timeDelta = ((data["last_timestamp"] - data["timestamp"]) / 1000);
+    timeDelta = ((data["timestamp"] - data["last_timestamp"]) / 1000);
     rxBits = GetSpeed(data["rxOctets"], data["last_rxOctets"], timeDelta);
     txBits = GetSpeed(data["txOctets"], data["last_txOctets"], timeDelta);
 
@@ -208,6 +207,7 @@ function CalcLoad(host, index) {
     return { rx: data["last_bw_rxBits"], tx: data["last_bw_txBits"], speed: data["last_bw_speed"] };
 }
 
+/*
 InitData();
 
 const usgPromise = RefreshHostData2(config.usgIp, [ config.usgWanIndex ]);
@@ -217,6 +217,44 @@ const switchPromise = RefreshHostData2(config.switchIp, config.switchIndexes);
 Promise.all([usgPromise, wapPromise, switchPromise]).then(() => {
     console.log(snmpData);
 });
+*/
 
+// See MMM-SystemStats for an alterative where this module calls the refresh
+
+var isRunning = false;
+module.exports = NodeHelper.create({
+    start: () => {
+        console.log(this.name + " helper started ...")
+    },
+    socketNotificationReceived : function(notification , payload) {
+        if (notification === "SNMP_REFRESH") {
+            if (isRunning == false) {
+                isRunning = true;
+                InitData();
+                const usgPromise = RefreshHostData2(config.usgIp, [ config.usgWanIndex ]);
+                const wapPromise = RefreshHostData2(config.wapIp, [ config.wapIndex ]);
+                const switchPromise = RefreshHostData2(config.switchIp, config.switchIndexes);
+                Promise.all([usgPromise, wapPromise, switchPromise]).then(() => {
+                    payload = [];
+
+                    var load = CalcLoad(config.usgIp, config.usgWanIndex);
+                    payload.push( { name: "WAN", rx: load.rx, tx: load.tx, speed:load.speed } );
+
+                    load = CalcLoad(config.wapIp, config.wapIndex);
+                    payload.push( { name: "WAP", rx: load.rx, tx: load.tx, speed:load.speed } );
+
+                    config.switchIndexes.forEach(element => {
+                        load = CalcLoad(config.switchIp, element);
+                        payload.push( { name: snmpData[config.switchIp][element]["name"], rx: load.rx, tx: load.tx, speed:load.speed } );
+                    });
+
+                    console.log(payload);
+                    this.sendSocketNotification("SNMP_DATA", payload);
+                    isRunning = false;
+            });
+            }
+        } 
+    }
+})
 
 
