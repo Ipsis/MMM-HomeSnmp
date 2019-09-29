@@ -159,12 +159,12 @@ function RefreshHostData(host, indexes) {
                     var val = ConvertBuffer(varbinds[i]);
                     if (oid2mib[currOid] === 'ifAlias')
                         snmpData[host][currIdx]["name"] = val;
-                    else if (oid2mib[currOid] === 'ifHighSpeed')
+                    else if (oid2mib[currOid] === 'ifHighSpeed') // speed of interface in 1,000,000 bits/second units
                         snmpData[host][currIdx]["speed"] = val;
-                    else if (oid2mib[currOid] === 'ifHCInOctets')
+                    else if (oid2mib[currOid] === 'ifHCInOctets') // number of octets received on the interface
                         snmpData[host][currIdx]["rxOctets"] = val;
                     else if (oid2mib[currOid] === 'ifHCOutOctets')
-                        snmpData[host][currIdx]["txOctets"] = val;
+                        snmpData[host][currIdx]["txOctets"] = val; // number of octets transmitted on the interface
 
                     // WAN is only 75Mbit connection
                     if (host == config.usgIp && currIdx == config.usgWanIndex)
@@ -207,17 +207,6 @@ function CalcLoad(host, index) {
     return { rx: data["last_bw_rxBits"], tx: data["last_bw_txBits"], speed: data["last_bw_speed"] };
 }
 
-/*
-InitData();
-
-const usgPromise = RefreshHostData2(config.usgIp, [ config.usgWanIndex ]);
-const wapPromise = RefreshHostData2(config.wapIp, [ config.wapIndex ]);
-const switchPromise = RefreshHostData2(config.switchIp, config.switchIndexes);
-
-Promise.all([usgPromise, wapPromise, switchPromise]).then(() => {
-    console.log(snmpData);
-});
-*/
 
 // See MMM-SystemStats for an alterative where this module calls the refresh
 
@@ -248,7 +237,6 @@ module.exports = NodeHelper.create({
                         payload.push( { name: snmpData[config.switchIp][element]["name"], rx: load.rx, tx: load.tx, speed:load.speed } );
                     });
 
-                    console.log(payload);
                     this.sendSocketNotification("SNMP_DATA", payload);
                     isRunning = false;
             });

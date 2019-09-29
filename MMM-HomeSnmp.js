@@ -60,6 +60,11 @@ Module.register("MMM-HomeSnmp", {
             wrapper.appendChild(row);
         });
 
+        var usgRxGage = document.createElement('div');
+        usgRxGage.id = 'usgRxGage';
+        usgRxGage.class = '200x160px';
+        wrapper.appendChild(usgRxGage);
+
 
         return wrapper;
     },
@@ -70,5 +75,19 @@ Module.register("MMM-HomeSnmp", {
             this.updateDom(0);
         }
     }, 
+    getScripts: function() {
+        return [
+            this.file('js/justgage-1.2.2/justgage.js'), 
+            this.file('js/justgage-1.2.2/raphael-2.1.4.min.js')
+        ]
+    },
+    notificationReceived: function(notification, payload, sender) {
+        if (notification === "DOM_OBJECTS_CREATED") {
+            var script = document.createElement("script");
+            'var usgRx, usgTx;' +
+                'usgRx = new JustGage({ id: "usgRxGage", value: getRandomInt(0, 100), min: 0, max: 100, title "RX", label: "bps", humanFriendly: true});'
+        }
+    },
 });
+
 
