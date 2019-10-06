@@ -51,6 +51,9 @@ Module.register("MMM-HomeSnmp", {
             this.file('js/justgage-1.2.2/raphael-2.1.4.min.js')
         ]
     },
+    getStyles: function() {
+        return [this.files("css/style.css")];
+    },
     getHeader: function() {
         return "Port Loads";
 
