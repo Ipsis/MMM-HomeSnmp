@@ -16,63 +16,33 @@ Module.register("MMM-HomeSnmp", {
     getDom: function() {
 
         var self = this;
-        var wrapper = document.createElement('table');
-
-        var row = document.createElement('tr');
-        var c1 = document.createElement('td');
-        c1.setAttribute('class', 'title');
-        c1.style.textAlign = self.config.align;
-        c1.innerText = "Name";
-        row.appendChild(c1);
-
-        var c2 = document.createElement('td');
-        c2.setAttribute('class', 'title');
-        c2.style.textAlign = self.config.align;
-        c2.innerText = "RX";
-        row.appendChild(c2);
-
-        var c3 = document.createElement('td');
-        c3.setAttribute('class', 'title');
-        c3.style.textAlign = self.config.align;
-        c3.innerText = "TX";
-        row.appendChild(c3);
-
-        wrapper.appendChild(row);
-
-        self.config.currData.forEach(element => {
-
-            var row = document.createElement('tr');
-            var c1 = document.createElement('td');
-            c1.style.textAlign = self.config.align;
-            c1.innerText = element.name;
-            row.appendChild(c1);
-
-            var c2 = document.createElement('td');
-            c2.style.textAlign = self.config.align;
-            c2.innerText = element.rx;
-            row.appendChild(c2);
-
-            var c3 = document.createElement('td');
-            c3.style.textAlign = self.config.align;
-            c3.innerText = element.tx;
-            row.appendChild(c3);
-
-            wrapper.appendChild(row);
-        });
-
+        var wrapper = document.createElement('div');
+        var header = document.createElement('div');
+        header.innerHTML = "Gauges";
         var usgRxGage = document.createElement('div');
         usgRxGage.id = 'usgRxGage';
-        usgRxGage.class = '200x160px';
-        wrapper.appendChild(usgRxGage);
 
+        var usgTxGage = document.createElement('div');
+        usgTxGage.id = 'usgTxGage';
+
+
+        wrapper.appendChild(header);
+        wrapper.appendChild(usgRxGage);
+        wrapper.appendChild(usgTxGage);
 
         return wrapper;
     },
     socketNotificationReceived: function(notification, payload) {
-        Log.error(notification);
         if (notification === "SNMP_DATA") {
             this.config.currData = payload;
-            this.updateDom(0);
+
+            payload.forEach(element => {
+                if (element.name === "WAN") {
+                    usgRx.refresh(element.rx, element.speed);
+                    usgTx.refresh(element.tx, element.speed);
+                }
+
+            });
         }
     }, 
     getScripts: function() {
@@ -81,11 +51,19 @@ Module.register("MMM-HomeSnmp", {
             this.file('js/justgage-1.2.2/raphael-2.1.4.min.js')
         ]
     },
+    getHeader: function() {
+        return "Port Loads";
+
+    },
     notificationReceived: function(notification, payload, sender) {
-        if (notification === "DOM_OBJECTS_CREATED") {
-            var script = document.createElement("script");
-            'var usgRx, usgTx;' +
-                'usgRx = new JustGage({ id: "usgRxGage", value: getRandomInt(0, 100), min: 0, max: 100, title "RX", label: "bps", humanFriendly: true});'
+		if (notification === 'DOM_OBJECTS_CREATED') {
+            var script = document.createElement('script');
+
+            script.innerHTML = 'var usgRx, usgTx;' +
+                'usgRx = new JustGage({id: "usgRxGage", value:0, min:0, max:75, title:"USG Download", label: "bps", gaugeWidthScale: "0.8", hideValue: false, humanFriendly: true, decimals: 2, hideMinMax: false, hideInnerShadow: true, valueFontColor: "#fff", valueFontFamily: "Roboto Condensed" });' + 
+                'usgTx = new JustGage({id: "usgTxGage", value:0, min:0, max:75, title:"USG Upload", label: "bps", gaugeWidthScale: "0.8", hideValue: false, humanFriendly: true, decimals: 2, hideMinMax: false, hideInnerShadow: true, valueFontColor: "#fff", valueFontFamily: "Roboto Condensed" });'
+
+            document.body.appendChild(script);
         }
     },
 });
