@@ -230,7 +230,7 @@ module.exports = NodeHelper.create({
                     payload.push( { name: "WAN", rx: load.rx, tx: load.tx, speed:load.speed } );
 
                     load = CalcLoad(config.wapIp, config.wapIndex);
-                    payload.push( { name: "WAP", rx: load.rx, tx: load.tx, speed:load.speed } );
+                    payload.push( { name: "UWAP", rx: load.rx, tx: load.tx, speed:load.speed } );
 
                     config.switchIndexes.forEach(element => {
                         load = CalcLoad(config.switchIp, element);

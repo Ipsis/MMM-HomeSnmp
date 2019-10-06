@@ -1,5 +1,8 @@
   
-#usgRxGage, #usgTxGage{
+#usgRxGage, #usgTxGage, #wapRxGage, #wapTxGage, #p1RxGage, #p1TxGage, #p2RxGage, #p2TxGage, #p3RxGage, #p3TxGage, #p4RxGage, #p4TxGage, #p5RxGage, #p5TxGage, #p6RxGage, #p6TxGage, #p7RxGage, #p7TxGage, #p8RxGage, #p8TxGage {
+    width:150px; height:100px;
+    display: inline-block;
+} {
     width:150px; height:100px;
     display: inline-block;
 }
